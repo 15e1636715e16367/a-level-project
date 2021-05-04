@@ -6,6 +6,9 @@ let sketch = function (p: p5) {
   let x = 400;
   let y = 400;
 
+  p.setup = function() {
+    p.createCanvas(700, 410);
+  };
 
   p.draw = function () {
     p.background(220);
@@ -22,16 +25,26 @@ let sketch = function (p: p5) {
   }
 
 
-  function keyPressed() {
-    if (p.keyCode === p.UP_ARROW) {
+  p.keyTyped = function() {
+    if (p.key === 'w') {
       y = y - 10;
-    } else if (p.keyCode === p.DOWN_ARROW) {
-      y = y + 10;
+    } else if (p.key !== 'w') {
+      y = y;
     }
-    if (p.keyCode === p.LEFT_ARROW) {
+    if (p.key === 's') {
+      y = y + 10;
+    } else if (p.key !== 's') {
+      y = y
+    }
+    if (p.key === 'a') {
       x = x - 5;
-    } else if (p.keyCode === p.RIGHT_ARROW) {
+    } else if (p.key !== 'a') {
       x = x + 5;
+    }
+    if (p.key === 'd') {
+      x = x + 5;
+    } else if (p.key !== 'd') {
+      x = x
     }
 
   }
