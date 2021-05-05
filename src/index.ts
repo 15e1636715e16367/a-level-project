@@ -1,7 +1,5 @@
 import * as p5 from "p5"
 
-console.log('hi')
-
 let sketch = function (p: p5) {
   let x = 400;
   let y = 400;
@@ -16,28 +14,23 @@ let sketch = function (p: p5) {
     p.ellipse(x, y, 50, 50);
 
 
-    if (p.keyIsPressed) {
-      if (p.key == 'd') {
-        x += 5;
-      } else if (p.key == 'a') {
-        x -= 5;
-      } else if (p.key == 'w') {
-        y -= 5;
-      } else if (p.key == 's') {
-        y += 5;
-      }
+    if (p.keyIsDown(68)) {
+      x += 5;
     }
-
-
-
-
-    if (x >= 400) {
-      x = 0;
+    if (p.keyIsDown(65)) {
+      x -= 5;
     }
-
+    if (p.keyIsDown(87)) {
+      y -= 5;
+    }
+    if (p.keyIsDown(83)) {
+      y += 5;
+    }
   }
 
-
-
 }
+
+
+
+
 let myp5 = new p5(sketch);
