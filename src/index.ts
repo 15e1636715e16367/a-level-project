@@ -8,15 +8,11 @@ let canvasX = 800;
 let canvasY = 500;
 
 
-
-let plX = 400;
-let plY = 375;
+let plPos : p5.Vector;
 let pWidth = 30;
 let pHeight = 70;
 
-
-let blX = 200; 
-let blY = 300;
+let blPos : p5.Vector;
 let bWidth = 200;
 let bHeight = 40;
 
@@ -29,9 +25,7 @@ let minHeight = 375;
 let maxHeight = 50;
 let jumpCounter = 0;
 
-
-
-
+let MOVE_LEFT : p5.Vector;
 
 let gametest = function (p : p5) {
   p.setup = function () {
@@ -39,21 +33,12 @@ let gametest = function (p : p5) {
     p.rectMode(p.CENTER);
     p.textAlign(p.CENTER);
 
+    plPos = p.createVector (400, 375)
+    blPos = p.createVector (200,300)
 
-    
-
-
-
-
-
-
+    MOVE_LEFT = p.createVector(-1, 0)
 
   } 
-
-
-
-
-  
 
   p.draw = function () {
 
@@ -64,9 +49,12 @@ let gametest = function (p : p5) {
     if(stage == 0) {
       game();
     }
+
+    blPos.add(MOVE_LEFT)
+    if (blPos.x < 0) {
+      blPos.x = p.width
+    } 
     
-
-
 
   } 
 
@@ -87,15 +75,15 @@ let gametest = function (p : p5) {
     p.stroke(0);
     p.strokeWeight(5);
     p.fill(255, 120, 0);
-    p.rect(blX, blY, bWidth, bHeight);
+    p.rect(blPos.x, blPos.y, bWidth, bHeight);
 
 
     p.stroke(0);
     p.fill(150, 0, 70);
-    p.rect(plX, plY, pWidth, pHeight);
+    p.rect(plPos.x, plPos.y, pWidth, pHeight);
 
-    if(plX >= blX - bWidth/2 && plX <= blX + bWidth/2 && plY + bHeight >= blY - bHeight/2 && plY + bHeight <= blY + bHeight/2 && jump == false ) {
-      plY = plY;
+    if(plPos.x >= blPos.x - bWidth/2 && plPos.x <= blPos.x + bWidth/2 && plPos.y + bHeight >= blPos.y - bHeight/2 && plPos.y + bHeight <= blPos.y + bHeight/2 && jump == false ) {
+      // plPos.y = plPos.y;
       velocity = 0;
       jumpCounter = 0;
 
@@ -104,23 +92,21 @@ let gametest = function (p : p5) {
     }
 
     
-
-    
   }
 
   function gravity() {
-    if (plY >= minHeight && jump == false) {
-      plY = plY;
+    if (plPos.y >= minHeight && jump == false) {
+      // plPos.y = plPos.y;
       jumpCounter = 0;
     } else {
-    plY = plY + (direction*velocity);
+    plPos.y = plPos.y + (direction*velocity);
 
     }
 
     if (jump == true) {
-      if (plY <= maxHeight || jumpCounter >= jumpPower) {
-        if (plY >= minHeight) {
-          plY = minHeight;
+      if (plPos.y <= maxHeight || jumpCounter >= jumpPower) {
+        if (plPos.y >= minHeight) {
+          plPos.y = minHeight;
         } else {
           velocity = fallingSpeed;
         }
@@ -139,23 +125,21 @@ let gametest = function (p : p5) {
 
   }
 
-  
-
 
   p.keyPressed = function() {
     if (p.keyIsDown(68)) {
-      plX += 5;
+      plPos.x += 5;
       
     }
     if (p.keyIsDown(65)) {
-      plX = plX - 5;
+      plPos.x = plPos.x - 5;
       
     }
     if (p.keyIsDown(87)) {
-      plY -= 5;
+      plPos.y -= 5;
     }
     if (p.keyIsDown(83)) {
-      plY += 5;
+      plPos.y += 5;
     }
 
 
@@ -170,9 +154,6 @@ let gametest = function (p : p5) {
       jump = false;
     }
   }
-
-  
-
 
 
 }
