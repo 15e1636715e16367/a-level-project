@@ -83,7 +83,6 @@ let gametest = function (p : p5) {
     p.rect(plPos.x, plPos.y, pWidth, pHeight);
 
     if(plPos.x >= blPos.x - bWidth/2 && plPos.x <= blPos.x + bWidth/2 && plPos.y + bHeight >= blPos.y - bHeight/2 && plPos.y + bHeight <= blPos.y + bHeight/2 && jump == false ) {
-      // plPos.y = plPos.y;
       velocity = 0;
       jumpCounter = 0;
 
@@ -96,7 +95,6 @@ let gametest = function (p : p5) {
 
   function gravity() {
     if (plPos.y >= minHeight && jump == false) {
-      // plPos.y = plPos.y;
       jumpCounter = 0;
     } else {
     plPos.y = plPos.y + (direction*velocity);
