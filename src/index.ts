@@ -140,7 +140,7 @@ let gametest = function (p: p5) {
 
     }
     if (p.keyIsDown(65)) {
-      player.pos.x = player.pos.x - 5;
+      player.pos.x -= 5;
 
     }
   }
