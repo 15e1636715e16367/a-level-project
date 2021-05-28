@@ -1,4 +1,7 @@
+import { fill } from "lodash";
 import * as p5 from "p5"
+
+
 
 //starting stage
 let stage = 0;
@@ -29,10 +32,13 @@ let jump = false;
 let direction = 1;
 let velocity = 2;
 let jumpPower = 12;
-let fallingSpeed = 2;
+let fallingSpeed = 6;
 let minHeight = 375;
 let maxHeight = 50;
 let jumpCounter = 0;
+
+let collision1: number
+let collisionHeight: number
 
 //assigning variable to a vector
 let MOVE_LEFT: p5.Vector;
@@ -48,10 +54,14 @@ let gametest = function (p: p5) {
     player = new GameObject(p.createVector(400, 375), 30, 70)
     box = new GameObject(p.createVector(200, 350), 200, 40)
 
+    collision1 = box.pos.x + 160;
+    collisionHeight = box.height;
+
 
 
     //assigning move_left to a vector
     MOVE_LEFT = p.createVector(-1, 0)
+
 
   }
 
@@ -107,6 +117,13 @@ let gametest = function (p: p5) {
       velocity = 0;
       jumpCounter = 0;
     }
+    //collision improve
+
+    if(player.pos.x >= collisionHeight + box.width/2
+      && player.pos.x <= box.pos.x + box.width/2 
+      && player.pos.y + box.height/2 >= box.pos.y - box.height / 2) {
+        player.pos.x = player.pos.x + 5;
+      }
   }
 
   //creating gravity function
@@ -131,6 +148,8 @@ let gametest = function (p: p5) {
     } else {
       velocity = fallingSpeed;
     }
+
+    
   }
 
   //player move left and right
@@ -143,6 +162,7 @@ let gametest = function (p: p5) {
       player.pos.x -= 5;
 
     }
+
   }
 
   //player jump
