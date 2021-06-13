@@ -1,5 +1,7 @@
-import { fill } from "lodash";
 import * as p5 from "p5"
+import GameObject from "./GameObject";
+import Player from "./Player";
+import Box from './Box';
 
 
 
@@ -11,21 +13,11 @@ let canvasX = 1000;
 let canvasY = 500;
 
 //gameobject 
-class GameObject {
-  pos: p5.Vector;
-  width: number;
-  height: number;
-  constructor(pos: p5.Vector, width: number, height: number) {
-    this.pos = pos;
-    this.width = width;
-    this.height = height;
 
-  }
-}
 
 //assigning gameobject to variables
-let player: GameObject
-let box: GameObject
+let player: Player
+let box: Box
 
 //jump and gravity variables
 let jump = false;
@@ -42,6 +34,8 @@ let collisionHeight: number
 
 //assigning variable to a vector
 let MOVE_LEFT: p5.Vector;
+let MOVE_RIGHT: p5.Vector
+let MOVE_NEUTRAL: p5.Vector
 
 let gametest = function (p: p5) {
   p.setup = function () {
@@ -51,8 +45,8 @@ let gametest = function (p: p5) {
     p.textAlign(p.CENTER);
 
     //creating player and box as vectors with the class gameobject
-    player = new GameObject(p.createVector(400, 375), 30, 70)
-    box = new GameObject(p.createVector(200, 350), 200, 40)
+    player = new Player(p.createVector(400, 375), 30, 70, true)
+    box = new Box(p.createVector(200, 350), 200, 40, true)
 
     collision1 = box.pos.x + 160;
     collisionHeight = box.height;
@@ -61,6 +55,8 @@ let gametest = function (p: p5) {
 
     //assigning move_left to a vector
     MOVE_LEFT = p.createVector(-1, 0)
+    MOVE_RIGHT = p.createVector(1, 0)
+    MOVE_NEUTRAL = p.createVector(0,0)
 
 
   }
@@ -71,7 +67,7 @@ let gametest = function (p: p5) {
     p.translate(-player.pos.x + p.width / 2, 0)
 
     //functions
-    p.keyPressed();
+    
     p.keyTyped();
     gravity();
 
@@ -80,11 +76,18 @@ let gametest = function (p: p5) {
       game();
     }
 
-    //box movement
-    box.pos.add(MOVE_LEFT)
+    //box1 movement
+    if (box.pos.x > 300) {
+      
+      box.pos.add(MOVE_LEFT)
+    } 
     if (box.pos.x < 0) {
-      box.pos.x = p.width
+      
+      box.pos.add(MOVE_RIGHT)
     }
+    
+    
+    
   }
 
 
@@ -98,15 +101,13 @@ let gametest = function (p: p5) {
     p.rect(p.width / 2, 450, 4000, 100)
 
     //drawing box
-    p.stroke(0);
-    p.strokeWeight(5);
-    p.fill(255, 120, 0);
-    p.rect(box.pos.x, box.pos.y, box.width, box.height);
+    
 
     //drawing player
-    p.stroke(0);
-    p.fill(150, 0, 70);
-    p.rect(player.pos.x, player.pos.y, player.width, player.height);
+    box.draw(p)
+    
+    player.draw(p)
+    player.update(p)
 
     //collisions
     if (player.pos.x >= box.pos.x - box.width / 2
@@ -118,12 +119,13 @@ let gametest = function (p: p5) {
       jumpCounter = 0;
     }
     //collision improve
+    
 
-    if(player.pos.x >= collisionHeight + box.width/2
-      && player.pos.x <= box.pos.x + box.width/2 
-      && player.pos.y + box.height/2 >= box.pos.y - box.height / 2) {
-        player.pos.x = player.pos.x + 5;
-      }
+    //if(player.pos.x >= collisionHeight + box.width/2
+      //&& player.pos.x <= box.pos.x + box.width/2 
+      //&& player.pos.y + box.height/2 >= box.pos.y - box.height / 2) {
+        //player.pos.x = player.pos.x + 5;
+      //}
   }
 
   //creating gravity function
@@ -153,18 +155,7 @@ let gametest = function (p: p5) {
   }
 
   //player move left and right
-  p.keyPressed = function () {
-    if (p.keyIsDown(68)) {
-      player.pos.x += 5;
-
-    }
-    if (p.keyIsDown(65)) {
-      player.pos.x -= 5;
-
-    }
-
-  }
-
+  
   //player jump
   p.keyTyped = function () {
     if (p.keyIsDown(32)) {
