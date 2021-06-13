@@ -1,17 +1,25 @@
 import * as p5 from "p5";
 import GameObject from "./GameObject";
+import { Bodies, Engine } from 'matter-js';
 
 class Box extends GameObject {
-  constructor(pos: p5.Vector, width: number, height: number, collidable: boolean) {
-    super(pos, width, height, collidable)
+  constructor(
+    engine: Engine,
+    pos: p5.Vector,
+    width: number,
+    height: number) {
+    super(engine, Bodies.rectangle(pos.x, pos.y, width, height, { isStatic: true }))
   }
+  update(p: p5) {
+  }
+
   draw(p: p5) {
     p.stroke(0);
     p.strokeWeight(5);
     p.fill(255, 120, 0);
-    p.rect(this.pos.x, this.pos.y, this.width, this.height);
+
+    this.drawBody(p);
   }
-  
 }
 
 export default Box

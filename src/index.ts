@@ -1,9 +1,10 @@
 import * as p5 from "p5"
-import GameObject from "./GameObject";
+import { Engine, Body, Vector, Bodies, Composite } from 'matter-js';
 import Player from "./Player";
 import Box from './Box';
 
-
+// Create the Physics Engine instance
+const engine = Engine.create();
 
 //starting stage
 let stage = 0;
@@ -12,12 +13,10 @@ let stage = 0;
 let canvasX = 1000;
 let canvasY = 500;
 
-//gameobject 
-
-
 //assigning gameobject to variables
 let player: Player
 let box: Box
+let ground: Body;
 
 //jump and gravity variables
 let jump = false;
@@ -29,13 +28,10 @@ let minHeight = 375;
 let maxHeight = 50;
 let jumpCounter = 0;
 
-let collision1: number
-let collisionHeight: number
-
 //assigning variable to a vector
-let MOVE_LEFT: p5.Vector;
-let MOVE_RIGHT: p5.Vector
-let MOVE_NEUTRAL: p5.Vector
+let MOVE_LEFT: Vector;
+let MOVE_RIGHT: Vector
+let MOVE_NEUTRAL: Vector
 
 let gametest = function (p: p5) {
   p.setup = function () {
@@ -45,31 +41,29 @@ let gametest = function (p: p5) {
     p.textAlign(p.CENTER);
 
     //creating player and box as vectors with the class gameobject
-    player = new Player(p.createVector(400, 375), 30, 70, true)
-    box = new Box(p.createVector(200, 350), 200, 40, true)
+    player = new Player(engine, p.createVector(400, 375), 30, 70);
+    box = new Box(engine, p.createVector(200, 350), 200, 40);
 
-    collision1 = box.pos.x + 160;
-    collisionHeight = box.height;
-
-
+    // Create the ground as a fixed physics body
+    ground = Bodies.rectangle(p.width / 2, 450, 4000, 100, { isStatic: true });
+    Composite.add(engine.world, ground);
 
     //assigning move_left to a vector
-    MOVE_LEFT = p.createVector(-1, 0)
-    MOVE_RIGHT = p.createVector(1, 0)
-    MOVE_NEUTRAL = p.createVector(0,0)
-
-
+    MOVE_LEFT = Vector.create(-0.1, 0)
+    MOVE_RIGHT = Vector.create(0.1, 0)
+    MOVE_NEUTRAL = Vector.create(0, 0)
   }
 
   p.draw = function () {
+    // Tell the physics engine to iterate
+    Engine.update(engine, p.deltaTime);
 
     //side scrolling
-    p.translate(-player.pos.x + p.width / 2, 0)
+    p.translate(-player.body.position.x + (p.width / 2), 0)
 
     //functions
-    
+
     p.keyTyped();
-    gravity();
 
     //setting game level
     if (stage == 0) {
@@ -77,17 +71,12 @@ let gametest = function (p: p5) {
     }
 
     //box1 movement
-    if (box.pos.x > 300) {
-      
-      box.pos.add(MOVE_LEFT)
-    } 
-    if (box.pos.x < 0) {
-      
-      box.pos.add(MOVE_RIGHT)
+    if (box.body.position.x > 300) {
+      Body.applyForce(box.body, MOVE_NEUTRAL, MOVE_LEFT);
     }
-    
-    
-    
+    if (box.body.position.x < 0) {
+      Body.applyForce(box.body, MOVE_NEUTRAL, MOVE_RIGHT);
+    }
   }
 
 
@@ -95,77 +84,32 @@ let gametest = function (p: p5) {
     //blue sky
     p.background(150, 230, 240);
 
-    //grass
-    p.noStroke();
+    // grass
+    // p.noStroke();
+    p.stroke(1);
     p.fill(100, 200, 75);
-    p.rect(p.width / 2, 450, 4000, 100)
+    p.beginShape();
+    ground.vertices.forEach(({ x, y }) => p.vertex(x, y));
+    p.endShape(p.CLOSE);
 
-    //drawing box
-    
-
-    //drawing player
-    box.draw(p)
-    
-    player.draw(p)
+    // Update the game objects
+    box.update(p);
     player.update(p)
 
-    //collisions
-    if (player.pos.x >= box.pos.x - box.width / 2
-      && player.pos.x <= box.pos.x + box.width / 2
-      && player.pos.y + box.height >= box.pos.y - box.height / 2
-      && player.pos.y + box.height <= box.pos.y + box.height / 2
-      && jump == false) {
-      velocity = 0;
-      jumpCounter = 0;
-    }
-    //collision improve
-    
-
-    //if(player.pos.x >= collisionHeight + box.width/2
-      //&& player.pos.x <= box.pos.x + box.width/2 
-      //&& player.pos.y + box.height/2 >= box.pos.y - box.height / 2) {
-        //player.pos.x = player.pos.x + 5;
-      //}
+    // Draw the game objects
+    box.draw(p)
+    player.draw(p)
   }
 
-  //creating gravity function
-  function gravity() {
-    if (player.pos.y >= minHeight && jump == false) {
-      jumpCounter = 0;
-    } else {
-      player.pos.y = player.pos.y + (direction * velocity);
-
-    }
-    if (jump == true) {
-      if (player.pos.y <= maxHeight || jumpCounter >= jumpPower) {
-        if (player.pos.y >= minHeight) {
-          player.pos.y = minHeight;
-        } else {
-          velocity = fallingSpeed;
-        }
-      } else {
-        velocity = -jumpPower;
-        jumpCounter = jumpCounter + 1;
-      }
-    } else {
-      velocity = fallingSpeed;
-    }
-
-    
-  }
-
-  //player move left and right
-  
   //player jump
   p.keyTyped = function () {
-    if (p.keyIsDown(32)) {
-      jump = true;
-    } else {
-      jump = false;
+
+    // Space bar is jump
+    if (p.keyCode === 32) {
+      player.jump();
     }
   }
-
 }
 
 //running game
-let myp5 = new p5(gametest)
+new p5(gametest)
