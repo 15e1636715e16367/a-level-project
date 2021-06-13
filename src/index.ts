@@ -13,8 +13,6 @@ let stage = 0;
 let canvasX = 1000;
 let canvasY = 500;
 
-//gameobject 
-
 //assigning gameobject to variables
 let player: Player
 let box: Box
@@ -43,8 +41,8 @@ let gametest = function (p: p5) {
     p.textAlign(p.CENTER);
 
     //creating player and box as vectors with the class gameobject
-    player = new Player(engine, p.createVector(400, 375), 30, 70, true);
-    box = new Box(engine, p.createVector(200, 350), 200, 40, true);
+    player = new Player(engine, p.createVector(400, 375), 30, 70);
+    box = new Box(engine, p.createVector(200, 350), 200, 40);
 
     // Create the ground as a fixed physics body
     ground = Bodies.rectangle(p.width / 2, 450, 4000, 100, { isStatic: true });
@@ -54,8 +52,6 @@ let gametest = function (p: p5) {
     MOVE_LEFT = Vector.create(-0.1, 0)
     MOVE_RIGHT = Vector.create(0.1, 0)
     MOVE_NEUTRAL = Vector.create(0, 0)
-
-
   }
 
   p.draw = function () {
@@ -63,7 +59,7 @@ let gametest = function (p: p5) {
     Engine.update(engine, p.deltaTime);
 
     //side scrolling
-    p.translate(-player.body.position.x + p.width / 2, 0)
+    p.translate(-player.body.position.x + (p.width / 2), 0)
 
     //functions
 
@@ -88,12 +84,13 @@ let gametest = function (p: p5) {
     //blue sky
     p.background(150, 230, 240);
 
-    //grass
-    p.noStroke();
+    // grass
+    // p.noStroke();
+    p.stroke(1);
     p.fill(100, 200, 75);
     p.beginShape();
     ground.vertices.forEach(({ x, y }) => p.vertex(x, y));
-    p.endShape();
+    p.endShape(p.CLOSE);
 
     // Update the game objects
     box.update(p);
@@ -104,44 +101,15 @@ let gametest = function (p: p5) {
     player.draw(p)
   }
 
-  //creating gravity function
-  // function gravity() {
-  //   if (player.pos.y >= minHeight && jump == false) {
-  //     jumpCounter = 0;
-  //   } else {
-  //     player.pos.y = player.pos.y + (direction * velocity);
-
-  //   }
-  //   if (jump == true) {
-  //     if (player.pos.y <= maxHeight || jumpCounter >= jumpPower) {
-  //       if (player.pos.y >= minHeight) {
-  //         player.pos.y = minHeight;
-  //       } else {
-  //         velocity = fallingSpeed;
-  //       }
-  //     } else {
-  //       velocity = -jumpPower;
-  //       jumpCounter = jumpCounter + 1;
-  //     }
-  //   } else {
-  //     velocity = fallingSpeed;
-  //   }
-
-
-  // }
-
-  //player move left and right
-
   //player jump
   p.keyTyped = function () {
-    if (p.keyIsDown(32)) {
-      jump = true;
-    } else {
-      jump = false;
+
+    // Space bar is jump
+    if (p.keyCode === 32) {
+      player.jump();
     }
   }
-
 }
 
 //running game
-let myp5 = new p5(gametest)
+new p5(gametest)
