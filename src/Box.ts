@@ -11,7 +11,6 @@ class Box extends GameObject {
     p.fill(255, 120, 0);
     p.rect(this.pos.x, this.pos.y, this.width, this.height);
   }
-  
 }
 
 export default Box
