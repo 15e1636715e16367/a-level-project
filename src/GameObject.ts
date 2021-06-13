@@ -1,25 +1,30 @@
 import * as p5 from "p5";
+import { Body, Composite, Engine } from 'matter-js';
 
 //creating game object
-class GameObject {
-  pos: p5.Vector;
-  width: number;
-  height: number;
+abstract class GameObject {
+  body: Body;
   collidable: boolean;
-  constructor(pos: p5.Vector, width: number, height: number, collidable: boolean) {
-    this.pos = pos;
-    this.width = width;
-    this.height = height;
-    this.collidable = collidable;
 
+  constructor(engine: Engine, body: Body) {
+    this.body = body;
+    Composite.add(engine.world, this.body)
   }
-  collision(other: GameObject) {
-    //where the collision code will go
+
+  abstract update(p: p5): void;
+  abstract draw(p: p5): void;
+
+  // Once the child class has setup the drawing, this function will 
+  // use p5 shapes/vertices to render the body
+  drawBody(p: p5) {
+    // Draw the body using the vertices from the physics engine
+    p.beginShape();
+    this.body.vertices.forEach(({ x, y }) => {
+      p.vertex(x, y);
+    });
+    p.endShape(p.CLOSE);
   }
-  
 }
-
-
 
 export default GameObject
 

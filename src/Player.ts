@@ -1,23 +1,41 @@
 import * as p5 from "p5";
+import { Bodies, Body, Engine, Vector } from 'matter-js';
+
 import GameObject from "./GameObject";
 
 class Player extends GameObject {
-  constructor(pos: p5.Vector, width: number, height: number, collidable: boolean) {
-    super(pos, width, height, collidable)
+  constructor(
+    engine: Engine,
+    pos: p5.Vector,
+    width: number,
+    height: number) {
+
+    // The inertia prevents rotation
+    super(engine, Bodies.rectangle(pos.x, pos.y, width, height, { inertia: Infinity, friction: 0.0 }))
   }
-  draw(p: p5) {
-    p.stroke(0);
-    p.fill(150, 0, 70);
-    p.rect(this.pos.x, this.pos.y, this.width, this.height);
-  }
-  
+
   update(p: p5) {
+
+    // Handle the controls
     if (p.keyIsDown(68)) {
-      this.pos.x += 5;
+      this.body.position.x += 1;
     }
     if (p.keyIsDown(65)) {
-      this.pos.x -= 5;
+      this.body.position.x -= 1;
     }
+  }
+
+  draw(p: p5) {
+    p.stroke(0);
+    p.strokeWeight(5);
+    p.fill(150, 0, 70);
+
+    this.drawBody(p);
+  }
+
+  jump() {
+    // Apply upwards force
+    Body.applyForce(this.body, Vector.create(0, 0), Vector.create(0, -0.005));
   }
 }
 
