@@ -71,12 +71,10 @@ let gametest = function (p: p5) {
     }
 
     //box1 movement
-    if (box.body.position.x > 300) {
-      Body.applyForce(box.body, MOVE_NEUTRAL, MOVE_LEFT);
-    }
-    if (box.body.position.x < 0) {
-      Body.applyForce(box.body, MOVE_NEUTRAL, MOVE_RIGHT);
-    }
+    
+    
+    Body.applyForce( box.body, {x: box.body.position.x, y: box.body.position.y}, {x: 0.05, y: 0});
+    
   }
 
 
