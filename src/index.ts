@@ -73,7 +73,7 @@ let gametest = function (p: p5) {
     //box1 movement
     
     
-    Body.applyForce( box.body, {x: box.body.position.x, y: box.body.position.y}, {x: 0.05, y: 0});
+    //Body.applyForce( box.body, {x: box.body.position.x, y: box.body.position.y}, {x: 0.005, y: 0});
     
   }
 
