@@ -8,7 +8,7 @@ class Box extends GameObject {
     pos: p5.Vector,
     width: number,
     height: number) {
-    super(engine, Bodies.rectangle(pos.x, pos.y, width, height, { inertia: Infinity, friction: 0.0, isStatic: false }))
+    super(engine, Bodies.rectangle(pos.x, pos.y, width, height, { inertia: Infinity, friction: 0.0, isStatic: true }))
   }
   update(p: p5) {
   }

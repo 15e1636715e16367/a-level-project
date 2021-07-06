@@ -16,6 +16,7 @@ let canvasY = 500;
 //assigning gameobject to variables
 let player: Player
 let box: Box
+let box1: Box
 let ground: Body;
 
 //jump and gravity variables
@@ -41,8 +42,10 @@ let gametest = function (p: p5) {
     p.textAlign(p.CENTER);
 
     //creating player and box as vectors with the class gameobject
+    
     player = new Player(engine, p.createVector(400, 375), 30, 70);
     box = new Box(engine, p.createVector(200, 350), 200, 40);
+    box1 = new Box(engine, p.createVector(550, 300), 200, 40 )
 
     // Create the ground as a fixed physics body
     ground = Bodies.rectangle(p.width / 2, 450, 4000, 100, { isStatic: true });
@@ -72,8 +75,12 @@ let gametest = function (p: p5) {
 
     //box1 movement
     
-    
-    //Body.applyForce( box.body, {x: box.body.position.x, y: box.body.position.y}, {x: 0.005, y: 0});
+    //if (box.body.position.x < 350) {
+      //Body.applyForce( box.body, {x: box.body.position.x, y: box.body.position.y}, {x: 0.001, y: 0});
+    //}
+    //if (box.body.position.x == 360) {
+      //Body.applyForce( box.body, {x: box.body.position.x, y: box.body.position.y}, {x: -0.001, y: 0});
+    //}
     
   }
 
@@ -92,21 +99,24 @@ let gametest = function (p: p5) {
 
     // Update the game objects
     box.update(p);
+    box1.update(p);
     player.update(p)
 
     // Draw the game objects
     box.draw(p)
     player.draw(p)
+    box1.draw(p)
   }
 
   //player jump
   p.keyTyped = function () {
 
     // Space bar is jump
-    if (p.keyCode === 32) {
-      player.jump();
-    }
-  }
+    //if (p.keyCode === 32) {
+      //player.jump();
+    //}
+  //}
+}
 }
 
 //running game

@@ -17,12 +17,28 @@ class Player extends GameObject {
   update(p: p5) {
 
     // Handle the controls
+    
+    let jumpTime = 0;
+    let jumpTimer = 300;
+    let canJump = true
+    
+    
+    if (p.keyIsDown(87) && canJump == true) {
+      canJump = false
+      let now = Date.now();
+      if ((now - jumpTime) > jumpTimer) {
+        Body.applyForce(this.body, Vector.create(0, 0), Vector.create(0, -0.01));
+          jumpTime = now;
+      }
+  }
     if (p.keyIsDown(68)) {
       this.body.position.x += 1;
     }
     if (p.keyIsDown(65)) {
       this.body.position.x -= 1;
     }
+  
+  
   }
 
   draw(p: p5) {
@@ -33,10 +49,8 @@ class Player extends GameObject {
     this.drawBody(p);
   }
 
-  jump() {
-    // Apply upwards force
-    Body.applyForce(this.body, Vector.create(0, 0), Vector.create(0, -0.005));
-  }
+  
+  
 }
 
 export default Player
