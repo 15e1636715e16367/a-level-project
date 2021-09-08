@@ -1,7 +1,10 @@
 import * as p5 from "p5"
-import { Engine, Body, Vector, Bodies, Composite } from 'matter-js';
+import { Engine, Body, Vector, Bodies, Composite, Events, IEventCollision } from 'matter-js';
 import Player from "./Player";
 import Box from './Box';
+import End from "./End";
+import * as Matter from "matter-js";
+import { deflateRaw } from "zlib";
 
 // Create the Physics Engine instance
 const engine = Engine.create();
@@ -15,9 +18,11 @@ let canvasY = 500;
 
 //assigning gameobject to variables
 let player: Player
+let boxes: Box[] = []
 let box: Box
 let box1: Box
-let ground: Body;
+let ground: Box;
+let levelEnd1: End
 
 //jump and gravity variables
 let jump = false;
@@ -42,14 +47,47 @@ let gametest = function (p: p5) {
     p.textAlign(p.CENTER);
 
     //creating player and box as vectors with the class gameobject
-    
     player = new Player(engine, p.createVector(400, 375), 30, 70);
-    box = new Box(engine, p.createVector(200, 350), 200, 40);
-    box1 = new Box(engine, p.createVector(550, 300), 200, 40 )
+    boxes = [box = new Box(engine, p.createVector(200, 350), 200, 40), box1 = new Box(engine, p.createVector(550, 300), 200, 40), ground = new Box(engine, p.createVector(500, 450), 4000, 100) ]
+    levelEnd1 = new End(engine, p.createVector(1500, 300), 40, 40 )
+
+    player.canJump = false;
+
+
+
+    Events.on(engine, 'collisionStart', (event: IEventCollision<Engine>) => {
+      event.pairs
+          .filter(pair => pair.bodyA.id == player.body.id || pair.bodyB.id == player.body.id)
+          .forEach(pair => {
+              let otherBody = pair.bodyA.id == player.body.id ? pair.bodyB : pair.bodyA;
+              boxes.forEach(platform => {
+                  if (platform.body.id === otherBody.id) {
+                      player.canJump = true;
+                  }
+              })
+          })
+  })
+
+      Events.on(engine, 'collisionEnd', (event: IEventCollision<Engine>) => {
+        event.pairs
+            .filter(pair => pair.bodyA.id == player.body.id || pair.bodyB.id == player.body.id)
+            .forEach(pair => {
+                let otherBody = pair.bodyA.id == player.body.id ? pair.bodyB : pair.bodyA;
+                boxes.forEach(platform => {
+                    if (platform.body.id === otherBody.id) {
+                        player.canJump = false;
+                    }
+                })
+            })
+    })
 
     // Create the ground as a fixed physics body
-    ground = Bodies.rectangle(p.width / 2, 450, 4000, 100, { isStatic: true });
-    Composite.add(engine.world, ground);
+    
+
+
+    // Setup some collision detection
+   
+  
 
     //assigning move_left to a vector
     MOVE_LEFT = Vector.create(-0.1, 0)
@@ -71,16 +109,18 @@ let gametest = function (p: p5) {
     //setting game level
     if (stage == 0) {
       game();
+    } else {
+      if (stage == 1) {
+        game1();
+      }
     }
 
+    
     //box1 movement
     
-    //if (box.body.position.x < 350) {
-      //Body.applyForce( box.body, {x: box.body.position.x, y: box.body.position.y}, {x: 0.001, y: 0});
-    //}
-    //if (box.body.position.x == 360) {
-      //Body.applyForce( box.body, {x: box.body.position.x, y: box.body.position.y}, {x: -0.001, y: 0});
-    //}
+    if (box.body.position.x > 700) {
+      Body.applyForce( box.body, {x: box.body.position.x, y: box.body.position.y}, {x: 0.05, y: 0});
+    }
     
   }
 
@@ -94,21 +134,33 @@ let gametest = function (p: p5) {
     p.stroke(1);
     p.fill(100, 200, 75);
     p.beginShape();
-    ground.vertices.forEach(({ x, y }) => p.vertex(x, y));
+  
     p.endShape(p.CLOSE);
 
     // Update the game objects
-    box.update(p);
-    box1.update(p);
+    boxes.forEach(x => x.update(p))
     player.update(p)
+    levelEnd1.update(p);
 
     // Draw the game objects
-    box.draw(p)
+    boxes.forEach(x => x.draw(p))
+      
+    
     player.draw(p)
-    box1.draw(p)
+    levelEnd1.draw(p)
+
+  }
+  function game1() {
+    p.background(255, 255, 0);
+
   }
 
+  
+
   //player jump
+
+  
+
   p.keyTyped = function () {
 
     // Space bar is jump
@@ -119,5 +171,10 @@ let gametest = function (p: p5) {
 }
 }
 
+
+
 //running game
+
 new p5(gametest)
+
+

@@ -1,9 +1,11 @@
 import * as p5 from "p5";
 import { Bodies, Body, Engine, Vector } from 'matter-js';
-
 import GameObject from "./GameObject";
+import * as Matter from "matter-js";
 
 class Player extends GameObject {
+  canJump: boolean;
+
   constructor(
     engine: Engine,
     pos: p5.Vector,
@@ -12,7 +14,11 @@ class Player extends GameObject {
 
     // The inertia prevents rotation
     super(engine, Bodies.rectangle(pos.x, pos.y, width, height, { inertia: Infinity, friction: 0.0 }))
+
+    this.canJump;    
   }
+
+  
 
   update(p: p5) {
 
@@ -20,17 +26,21 @@ class Player extends GameObject {
     
     let jumpTime = 0;
     let jumpTimer = 300;
-    let canJump = true
+    let playerCanJump = false
+
+
+
+
     
+   
     
-    if (p.keyIsDown(87) && canJump == true) {
-      canJump = false
+    if (p.keyIsDown(87) && this.canJump == true ) {
       let now = Date.now();
       if ((now - jumpTime) > jumpTimer) {
         Body.applyForce(this.body, Vector.create(0, 0), Vector.create(0, -0.01));
           jumpTime = now;
       }
-  }
+    }
     if (p.keyIsDown(68)) {
       this.body.position.x += 1;
     }
