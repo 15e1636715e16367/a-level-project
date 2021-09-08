@@ -15,7 +15,7 @@ class Player extends GameObject {
     // The inertia prevents rotation
     super(engine, Bodies.rectangle(pos.x, pos.y, width, height, { inertia: Infinity, friction: 0.0 }))
 
-    this.canJump;    
+    this.canJump = false;    
   }
 
   
@@ -37,7 +37,7 @@ class Player extends GameObject {
     if (p.keyIsDown(87) && this.canJump == true ) {
       let now = Date.now();
       if ((now - jumpTime) > jumpTimer) {
-        Body.applyForce(this.body, Vector.create(0, 0), Vector.create(0, -0.01));
+        Body.applyForce(this.body, Vector.create(0, 0), Vector.create(0, -0.055));
           jumpTime = now;
       }
     }
