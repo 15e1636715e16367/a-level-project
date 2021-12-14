@@ -4,6 +4,7 @@ import Player from "./Player";
 import Box from './Box';
 import End from "./End";
 import Spike from './Spike';
+import HighJump from "./highJump";
 
 // Create the Physics Engine instance
 const engine = Engine.create();
@@ -19,47 +20,32 @@ let canvasY = 500;
 //assigning gameobject to variables
 let player: Player
 let boxes: Box[] = []
-let boxes1: Box[] = []
 let ends: End[] = []
-let ends1: End[] = []
 let spikes: Spike[] = []
+let highJumps: HighJump[] = []
+let stages: string[] = [];
 let box: Box
 let box1: Box
 let box2: Box
 let ground: Box;
 let levelEnd1: End
 
-//jump and gravity variables
-let jump = false;
-let direction = 1;
-let velocity = 2;
-let jumpPower = 12;
-let fallingSpeed = 6;
-let minHeight = 375;
-let maxHeight = 50;
-let jumpCounter = 0;
-
+//set player health to 3
 let playerHealth = 3;
-
-
-//assigning variable to a vector
-let MOVE_LEFT: Vector;
-let MOVE_RIGHT: Vector
-let MOVE_NEUTRAL: Vector
 
 let gametest = function (p: p5) {
 
-
-  function stageStored() {
-    let lastStage = stage
+  //function that starts game
+  function startGame() {
+    stageChange();
+    levelLoad();
+    this.hide()
   }
 
-
-
+  //checks if player is dead
   function isDead() {
-
     if (playerHealth === 0) {
-      console.log("Game Over")
+      //if player is dead clear all the objects in the game
       boxes.forEach(b => Composite.remove(engine.world, b.body));
       ends.forEach(b => Composite.remove(engine.world, b.body));
       spikes.forEach(b => Composite.remove(engine.world, b.body));
@@ -69,40 +55,84 @@ let gametest = function (p: p5) {
     }
   }
 
-
+  //changes stage
   function stageChange() {
     stage = stage + 1;
     console.log('Changing To Stage', stage)
   }
 
+  //loads level
   function levelLoad() {
     if (stage === 0) {
-      // Build stage 0
+
+      //clears all objects
+      boxes.forEach(b => Composite.remove(engine.world, b.body));
+      ends.forEach(b => Composite.remove(engine.world, b.body));
+      spikes.forEach(b => Composite.remove(engine.world, b.body));
+      highJumps.forEach(b => Composite.remove(engine.world, b.body));
+
+      //clears all lists
+      boxes = [];
+      ends = [];
+      spikes = [];
+
+      //pushing new objects for the level
+      boxes.push(box = new Box(engine, p.createVector(550, 350), 200, 40, 'grey'), 
+        box1 = new Box(engine, p.createVector(800, 300), 200, 40, 'grey'), 
+        ground = new Box(engine, p.createVector(500, 450), 4000, 100, 'green'),
+        new Box(engine, p.createVector(1100, 350), 200, 40, 'grey'),
+        new Box(engine, p.createVector(1500, 350), 200, 40, 'grey')    
+        )
+      ends.push(levelEnd1 = new End(engine, p.createVector(1850, 300), 40, 40))
+      spikes.push(new Spike(engine, p.createVector(1100, 389), 1300, 20))
+
+      //set player position
+      player = new Player(engine, p.createVector(400, 375), 30, 70);
+    
     } else if (stage === 1) {
 
-      stageStored();
-
-      
-
-      // Physically remove the boxes
+      //clears all objects
       boxes.forEach(b => Composite.remove(engine.world, b.body));
+      ends.forEach(b => Composite.remove(engine.world, b.body));
+      spikes.forEach(b => Composite.remove(engine.world, b.body));
+      highJumps.forEach(b => Composite.remove(engine.world, b.body));
 
-      // Transition to another level
+      //clears all lists
       boxes = [];
-      boxes.push(box2 = new Box(engine, p.createVector(800, 250), 200, 40), ground = new Box(engine, p.createVector(500, 450), 4000, 100,));
+      ends = [];
+      spikes = [];
 
+      //pushes new objects for new level
+      boxes.push(box = new Box(engine, p.createVector(550, 350), 200, 40, 'grey'), 
+        box1 = new Box(engine, p.createVector(800, 300), 200, 40, 'grey'), 
+        ground = new Box(engine, p.createVector(500, 450), 4000, 100, 'green'),
+        new Box(engine, p.createVector(1100, 350), 200, 40, 'grey'),
+        new Box(engine, p.createVector(1500, 350), 200, 40, 'grey')    
+        )
+      ends.push(levelEnd1 = new End(engine, p.createVector(1850, 300), 40, 40))
+      spikes.push(new Spike(engine, p.createVector(1100, 389), 1300, 20))
+      //resets player position
+      player = new Player(engine, p.createVector(400, 375), 30, 70);
+   
+    } else if (stage === 2) {
+      //clears all objects
+      boxes.forEach(b => Composite.remove(engine.world, b.body));
+      ends.forEach(b => Composite.remove(engine.world, b.body));
+      spikes.forEach(b => Composite.remove(engine.world, b.body));
+      highJumps.forEach(b => Composite.remove(engine.world, b.body));
 
-      player.body.velocity.x = 0
-      player.body.velocity.y = 0
-      player.body.position.x = 400
-      player.body.position.y = 375
+      //clears all lists
+      boxes = [];
+      ends = [];
+      spikes = [];
+
+      //pushes new objects for level
+      boxes.push(box2 = new Box(engine, p.createVector(800, 250), 200, 40, 'grey'), 
+        ground = new Box(engine, p.createVector(500, 450), 4000, 100, 'green'));
+      highJumps.push(new HighJump(engine, p.createVector(1500, 300), 40, 40))
+      //resetting player position
+      player = new Player(engine, p.createVector(400, 375), 30, 70)
     }
-  }
-
-  function gameOver() {
-
-
-
   }
 
   p.setup = function () {
@@ -111,34 +141,40 @@ let gametest = function (p: p5) {
     p.rectMode(p.CENTER);
     p.textAlign(p.CENTER);
 
+    //start game button
+    let button
+    button = p.createButton('Start Game')
+    button.position(475,200)
+    button.size(50, 50)
+    //if start game button pressed start the game
+    button.mousePressed(startGame)
+    //remove button after pressed
+    if (button.mousePressed) {
+      button.remove
+    }
+  
+    player = new Player(engine, p.createVector(400, 1000), 30, 70);
 
+    stages.push('stage 2')
 
-
-
-
-    //creating player and box as vectors with the class gameobject
-    player = new Player(engine, p.createVector(400, 375), 30, 70);
-    boxes = [box = new Box(engine, p.createVector(200, 350), 200, 40), box1 = new Box(engine, p.createVector(550, 300), 200, 40), ground = new Box(engine, p.createVector(500, 450), 4000, 100)]
-    ends = [levelEnd1 = new End(engine, p.createVector(1500, 300), 40, 40)]
-    spikes = [new Spike(engine, p.createVector(300, 300), 40, 40)]
     player.canJump = false;
     spikes.forEach(x => x.damaged = false)
 
-
-
-    Events.on(engine, 'collisionStart', (event: IEventCollision<Engine>) => {
+    //collision code for if player can jump
+    Events.on(engine, 'collisionActive', (event: IEventCollision<Engine>) => {
       event.pairs
         .filter(pair => pair.bodyA.id == player.body.id || pair.bodyB.id == player.body.id)
         .forEach(pair => {
           let otherBody = pair.bodyA.id == player.body.id ? pair.bodyB : pair.bodyA;
           boxes.forEach(platform => {
             if (platform.body.id === otherBody.id) {
-              player.canJump = true;
+                player.canJump = true;
             }
           })
         })
     })
 
+    //collision code for if player can jump
     Events.on(engine, 'collisionEnd', (event: IEventCollision<Engine>) => {
       event.pairs
         .filter(pair => pair.bodyA.id == player.body.id || pair.bodyB.id == player.body.id)
@@ -152,6 +188,7 @@ let gametest = function (p: p5) {
         })
     })
 
+    //collision code for if player touches level end
     Events.on(engine, 'collisionStart', (event: IEventCollision<Engine>) => {
       event.pairs
         .filter(pair => pair.bodyA.id == player.body.id || pair.bodyB.id == player.body.id)
@@ -159,13 +196,16 @@ let gametest = function (p: p5) {
           let otherBody = pair.bodyA.id == player.body.id ? pair.bodyB : pair.bodyA;
           ends.forEach(platform => {
             if (platform.body.id === otherBody.id) {
+              //change the level and load the level
               stageChange();
               levelLoad();
             }
           })
         })
     })
+    
 
+    //collision code for if player touches spike
     Events.on(engine, 'collisionStart', (event: IEventCollision<Engine>) => {
       event.pairs
         .filter(pair => pair.bodyA.id == player.body.id || pair.bodyB.id == player.body.id)
@@ -173,27 +213,46 @@ let gametest = function (p: p5) {
           let otherBody = pair.bodyA.id == player.body.id ? pair.bodyB : pair.bodyA;
           spikes.forEach(platform => {
             if (platform.body.id === otherBody.id) {
+              //removes a health point and checks if player is dead
               playerHealth = playerHealth - 1
               isDead();
+              player.canJump = true;
             }
           })
         })
     })
 
+    //collision code that makes sure the player can't double jump if on spikes
+    Events.on(engine, 'collisionEnd', (event: IEventCollision<Engine>) => {
+      event.pairs
+        .filter(pair => pair.bodyA.id == player.body.id || pair.bodyB.id == player.body.id)
+        .forEach(pair => {
+          let otherBody = pair.bodyA.id == player.body.id ? pair.bodyB : pair.bodyA;
+          spikes.forEach(platform => {
+            if (platform.body.id === otherBody.id) {
+              player.canJump = false;
+            }
+          })
+        })
+    })
 
-
-    // Create the ground as a fixed physics body
-
-
-
-    // Setup some collision detection
-
-
-
-    //assigning move_left to a vector
-    MOVE_LEFT = Vector.create(-0.1, 0)
-    MOVE_RIGHT = Vector.create(0.1, 0)
-    MOVE_NEUTRAL = Vector.create(0, 0)
+    //collison code for if player touches the high jump pickup
+    Events.on(engine, 'collisionStart', (event: IEventCollision<Engine>) => {
+      event.pairs
+        .filter(pair => pair.bodyA.id == player.body.id || pair.bodyB.id == player.body.id)
+        .forEach(pair => {
+          let otherBody = pair.bodyA.id == player.body.id ? pair.bodyB : pair.bodyA;
+          highJumps.forEach(platform => {
+            if (platform.body.id === otherBody.id) {
+              //allows player to high jump
+              player.highJumpEnabled = true;
+              //delete the high jump powerup so players can't collect it twice
+              highJumps = [];
+              highJumps.forEach(b => Composite.remove(engine.world, b.body));
+            }
+          })
+        })
+    })
   }
 
   p.draw = function () {
@@ -203,13 +262,17 @@ let gametest = function (p: p5) {
     //blue sky
     p.background(150, 230, 240);
 
-    let livesLeft = "Lives: " + playerHealth;
-    p.fill('black')
-    p.strokeWeight(1);
-    p.textSize(30)
-    p.text(livesLeft, 55, 30);
+    //lives ui
+    if (stage > 0) {
+      let livesLeft = "Lives: " + playerHealth;
+      p.fill('black')
+      p.strokeWeight(1);
+      p.textSize(30)
+      p.text(livesLeft, 55, 30);
+    }
+    
 
-
+    //GameOver screen + restart level
     if (playerHealth === 0) {
       let gameOverText = "GAMEOVER";
       p.fill('black')
@@ -223,39 +286,23 @@ let gametest = function (p: p5) {
       p.textSize(60)
       p.text(restart, 500, 350);
 
-      if (p.keyIsDown(75)) {
-        playerHealth =3
-        levelLoad();
-        
-      }
+      
     }
-
-
 
     //side scrolling
     p.translate(-player.body.position.x + (p.width / 2), 0)
 
     //functions
-
-    p.keyTyped();
     game();
 
-
-
-
-    //box1 movement
-
-    if (box.body.position.x > 700) {
-      Body.applyForce(box.body, { x: box.body.position.x, y: box.body.position.y }, { x: 0.05, y: 0 });
+    if (p.keyIsDown(75)) {
+      playerHealth =3
+      levelLoad(); 
     }
-
   }
 
 
   function game() {
-
-
-
     // grass
     // p.noStroke();
     p.stroke(1);
@@ -268,6 +315,7 @@ let gametest = function (p: p5) {
     boxes.forEach(x => x.update(p))
     ends.forEach(x => x.update(p))
     spikes.forEach(x => x.update(p))
+    highJumps.forEach(x => x.update(p))
     player.update(p)
 
 
@@ -275,27 +323,12 @@ let gametest = function (p: p5) {
     boxes.forEach(x => x.draw(p))
     ends.forEach(x => x.draw(p))
     spikes.forEach(x => x.draw(p))
+    highJumps.forEach(x => x.draw(p))
     player.draw(p)
-  }
-
-  //player jump
-
-
-
-  p.keyTyped = function () {
-
-    // Space bar is jump
-    //if (p.keyCode === 32) {
-    //player.jump();
-    //}
-    //}
   }
 }
 
-
-
 //running game
-
 new p5(gametest)
 
 
